@@ -18,9 +18,29 @@ class CrearCandidato(generic.CreateView):
         kwargs.update({
             'form1': self.get_form(),
             'candidatos': m.Candidato.objects.all(),
+            'leer_base' : self.leer_base(),
         })
         return super().get_context_data(**kwargs)
     
+    def leer_base(self,):
+        print('ingreso a la base')
+        with open('C:/Users/eadel/OneDrive/Documents/VISUAL_STUDIO_PROJECTS/LEARNING_PROJECTS/PRUEBA_TECNICA_ALEJO/JSON.txt', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            print(data)
+            # convertir a lista de objetos Candidato
+            candidatos = []
+            for item in data:
+                candidato = m.Candidato(
+                    estado='Reclutamiento',
+                    nombre=item.get('nombre'),
+                    cedula=item.get('doctO_IDENT'),
+                    rh=item.get('grupO_RH'),
+                    ciudad_expedicion=item.get('ciudad_e'),
+                    ciudad_nacimiento=item.get('ciudad_n'),
+                    ciudad_domicilio=item.get('ciudad_d')
+                )
+                candidato.save()
+
     def form_valid(self, form: f.CandidatoForm) -> HttpResponse:
         estado = form.cleaned_data.get('estado')
         nombre = form.cleaned_data.get('nombre')
@@ -208,15 +228,11 @@ class CrearPostulacion(generic.CreateView):
         kwargs.update({
             'form1': self.get_form(),
             'postulaciones': m.Postulacion.objects.all(),
-            #'leer_base' : self.leer_base()
+            
         })
         return super().get_context_data(**kwargs)
     
-    def leer_base(self,):
-        print('ingreso a la base')
-        with open('JSON.txt', 'r') as file:
-            data = json.load(file)
-            print(data)
+    
 
     def form_valid(self, form: f.PostulacionForm) -> HttpResponse:
         candidato = form.cleaned_data.get('candidato')
