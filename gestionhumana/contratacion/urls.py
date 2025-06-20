@@ -12,4 +12,7 @@ urlpatterns = [
     path('crear_postulacion/', views.CrearPostulacion.as_view(), name='crear_postulacion'),
     path('editar_postulacion/<int:pk>/', views.EditarPostulacion.as_view(), name='editar_postulacion'),
     path('eliminar_postulacion/<int:pk>/', views.EliminarPostulacion.as_view(), name='eliminar_postulacion'),
+    path('crear_orden/', views.CrearOrdenDeContratacion.as_view(), name='crear_orden'),
+    path('editar_orden/<int:pk>/', views.EditarOrdenDeContratacion.as_view(), name='editar_orden'),
+    path('eliminar_orden/<int:pk>/', views.EliminarOrdenDeContratacion.as_view(), name='eliminar_orden'),
 ]

@@ -15,3 +15,9 @@ class PostulacionForm(forms.ModelForm):
     class Meta:
         model = m.Postulacion
         fields = '__all__'
+
+class OrdenDeContratacionForm(forms.ModelForm):
+    class Meta:
+        model = m.OrdenDeContratacion
+        fields = ('postulacion', 'cliente', 'cargo','examenes')
+    

@@ -1,0 +1,157 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Candidatos</title>
+     <!-- JQUERY -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+     <!-- BOOTSTRAP -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <!-- FONT AWESOME -->
+    <script data-search-pseudo-elements defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha384-ujbKXb9V3HdK7jcWL6kHL1c+2Lj4MR4Gkjl7UtwpSHg/ClpViddK9TI7yU53frPN" crossorigin="anonymous"></script>
+
+</head>
+<body class="container">
+    <div class="row d-flex justify-content-center">
+        <a class="btn btn-primary" href="{% url 'contratacion:crear_candidato' %}">Candidatos</a>
+        <a class="btn btn-primary"  href="{% url 'contratacion:crear_oferta' %}">Ofertas</a>
+        <a class="btn btn-primary"  href="{% url 'contratacion:crear_postulacion' %}">postulaciones</a>
+        <a class="btn btn-primary"  href="{% url 'contratacion:crear_orden' %}">Ordenes</a>
+    </div>
+    <div class="row  d-flex justify-content-center">
+        <div class="card w-50">
+                <div class="h2 text-center w-100" style="color: blue">Formulario Ordenes de Contratacion</div>
+                <form method="POST" 
+                    {% if form2 %}
+                    action="{% url 'contratacion:editar_orden' object.id %}"
+                    
+                    {% else %}
+                    action="{% url 'contratacion:crear_orden' %}"
+                    {% endif %}
+                    class="form-control">
+                        {% csrf_token %}
+                        {% if form2 %}
+                        <div class="h2"> form Actualizacion</div>
+                        {{ form2|crispy }}
+                        {% else %}
+                        <div class="h2"> form creacion</div>
+                        {{ form1|crispy }}
+                        {% endif %}
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-primary w-100">Guardar</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+         <div class=" card w-100">
+            <h2 class="w-100 d-flex justify-content-center">Datos:</h2>
+            <table class="table w-100 table-primary ">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Candidato</th>
+                        <th>Postulación</th>
+                        <th>Cliente</th>
+                        <th>Examenes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidato in ordenes %}
+                    <tr>
+                        <td>{{ candidato.postulacion.id }}</td>
+                        <td>{{ candidato.postulacion.candidato }}</td>
+                        <td>{{ candidato.cliente }}</td>
+                        <td>{{ candidato.cargo }}</td>
+                        <td>{{ candidato.examenes }}</td>
+                        <td>
+                            <a  class="btn btn-primary w-100" href="{% url 'contratacion:editar_orden' candidato.id %}" >Editar</a>
+                            <form action="{% url 'contratacion:eliminar_orden' candidato.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+         </div>
+    </div>
+    
+    
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('ordenContratacionForm');
+        const alertContainer = document.getElementById('alert-container');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Previene el envío normal del formulario
+
+            alertContainer.innerHTML = ''; // Limpia mensajes anteriores
+
+            const formData = new FormData(form); // Obtiene todos los datos del formulario, incluyendo archivos
+
+            fetch(form.action, { // form.action es la URL de tu vista
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken') // Necesario para seguridad de Django
+                }
+            })
+            .then(response => {
+                // Si la respuesta no es 200 (ej. 400 Bad Request para errores)
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        // Lanza un error para que sea capturado por el .catch()
+                        throw { status: response.status, data: errorData };
+                    });
+                }
+                // Si la respuesta es 200 OK
+                return response.json();
+            })
+            .then(data => {
+                // Lógica para una respuesta exitosa (status 200)
+                if (data.success) {
+                    alertContainer.innerHTML = `<div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 15px;">${data.message}</div>`;
+                    form.reset(); // Limpia el formulario después de un éxito
+                    // Aquí podrías recargar la lista de órdenes si es necesario
+                    // window.location.reload(); // Para recargar toda la página
+                    // O hacer una nueva petición AJAX para actualizar solo la lista 'ordenes'
+                }
+            })
+            .catch(error => {
+                // Lógica para manejar errores (status 400 u otros errores de red)
+                console.error('Error al enviar el formulario:', error);
+                if (error.status === 400 && error.data && error.data.errors) {
+                    let errorMessage = 'Error de validación:';
+                    // Recorre los errores del formulario para mostrarlos
+                    for (const field in error.data.errors) {
+                        if (error.data.errors.hasOwnProperty(field)) {
+                            const errorList = error.data.errors[field];
+                            if (field === '__all__') { // Errores no relacionados con un campo específico
+                                errorMessage += ` ${errorList.join(', ')}`;
+                            } else if (field === 'postulacion') {
+                                // Aquí puedes poner tu alerta específica
+                                alert(`¡Atención! ${errorList.join(', ')}`);
+                                errorMessage += ` ${field}: ${errorList.join(', ')}`;
+                            } else {
+                                errorMessage += ` ${field}: ${errorList.join(', ')}`;
+                            }
+                        }
+                    }
+                    alertContainer.innerHTML = `<div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px;">${errorMessage}</div>`;
+                } else {
+                    alertContainer.innerHTML = `<div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px;">Ocurrió un error inesperado.</div>`;
+                }
+            });
+        });
+    });
+</script>
+</html>

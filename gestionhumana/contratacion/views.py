@@ -285,3 +285,92 @@ class EliminarPostulacion(generic.DeleteView):
         self.object = self.get_object()
         self.object.delete()
         return HttpResponseRedirect(self.success_url)
+    
+class CrearOrdenDeContratacion(generic.CreateView):
+    model = m.OrdenDeContratacion
+    form_class = f.OrdenDeContratacionForm
+    template_name = 'ordenes_list.html'
+    # success_url no está definido aquí en el código que me muestras. ESTO ES CLAVE.
+
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'ordenes': m.OrdenDeContratacion.objects.all(),
+            'form1': self.get_form(),
+        })
+        return super().get_context_data(**kwargs)
+    def form_valid(self, form: f.OrdenDeContratacionForm) -> JsonResponse:
+        # Esto guardará el objeto y lo asignará a self.object
+        self.object = form.save()
+        # En caso de éxito, respondemos con JSON y estado 200
+        return JsonResponse({'success': True, 'message': 'Orden de Contratación creada exitosamente.'}, status=200)
+    
+    def form_valid(self, form: f.OrdenDeContratacionForm) -> HttpResponse:
+        # Aquí estás creando y guardando el objeto manualmente
+        orden = m.OrdenDeContratacion(
+            postulacion=form.cleaned_data.get('postulacion'),
+            cliente=form.cleaned_data.get('cliente'),
+            cargo=form.cleaned_data.get('cargo'),
+            examenes=form.cleaned_data.get('examenes')
+        )
+        orden.save()
+
+        # Y aquí estás redirigiendo manualmente
+        return HttpResponseRedirect(reverse_lazy('contratacion:crear_orden'))
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            print('CREATE')
+            return self.form_valid(form) # Llama a tu form_valid personalizado
+        else:
+            print('NO SE CREO')
+            return JsonResponse({'success': True, 'message': 'Usuario ya tiene Postulacion en proceso'}, status=200)
+            return self.form_invalid(form) # Llama a form_invalid
+
+class EditarOrdenDeContratacion(generic.UpdateView):
+    model = m.OrdenDeContratacion
+    form_class = f.OrdenDeContratacionForm
+    template_name = 'ordenes_list.html'
+    
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'form2': self.get_form(),
+            'ordenes': m.OrdenDeContratacion.objects.all(),
+        })
+        return super().get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        orden = m.OrdenDeContratacion.objects.get(pk=self.kwargs['pk'])
+        orden.postulacion = form.cleaned_data.get('postulacion')
+        orden.cliente = form.cleaned_data.get('cliente')
+        orden.cargo = form.cleaned_data.get('cargo')
+        orden.examenes = form.cleaned_data.get('examenes')
+        orden.save()
+        
+        return HttpResponseRedirect(reverse_lazy('contratacion:crear_orden'))
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        form = self.form_class(request.POST, request.FILES, instance=self.get_object())
+        if form.is_valid():
+            print('UPDATE')
+            return self.form_valid(form)
+        else:
+            print('NO SE ACTUALIZO')
+            return self.form_invalid(form)
+        
+class EliminarOrdenDeContratacion(generic.DeleteView):
+    model = m.OrdenDeContratacion
+    template_name = 'ordenes_list.html'
+    success_url = reverse_lazy('contratacion:crear_orden')
+
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'ordenes': m.OrdenDeContratacion.objects.all(),
+        })
+        return super().get_context_data(**kwargs)
+
+    
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        self.object = self.get_object()
+        self.object.delete()
+        return HttpResponseRedirect(self.success_url)

@@ -52,7 +52,7 @@ class Postulacion(models.Model):
         verbose_name_plural = "Postulaciones"
 
 class OrdenDeContratacion(models.Model):
-    postulacion = models.OneToOneField(Postulacion, on_delete=models.CASCADE)
+    postulacion = models.OneToOneField(Postulacion, on_delete=models.SET_NULL, null=True, blank=True, related_name='orden_contratacion')
     cliente = models.CharField(max_length=100, blank=True, null=True)
     cargo = models.CharField(max_length=100, blank=True, null=True)
     examenes = models.FileField(upload_to='examenes/', blank=True, null=True)
