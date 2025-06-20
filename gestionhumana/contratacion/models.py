@@ -52,14 +52,13 @@ class Postulacion(models.Model):
         verbose_name_plural = "Postulaciones"
 
 class OrdenDeContratacion(models.Model):
-    candidato = models.ForeignKey(Candidato, on_delete=models.CASCADE)
-    postulacion = models.ForeignKey(Postulacion, on_delete=models.CASCADE)
+    postulacion = models.OneToOneField(Postulacion, on_delete=models.CASCADE)
     cliente = models.CharField(max_length=100, blank=True, null=True)
     cargo = models.CharField(max_length=100, blank=True, null=True)
     examenes = models.FileField(upload_to='examenes/', blank=True, null=True)
 
     def __str__(self):
-        return f"Orden de Contratación: {self.candidato.nombre} - {self.oferta_laboral.cargo}"
+        return f"Orden de Contratación: {self.postulacion.candidato.nombre} - {self.cargo}"
 
     class Meta:
         verbose_name = "Orden de Contratación"

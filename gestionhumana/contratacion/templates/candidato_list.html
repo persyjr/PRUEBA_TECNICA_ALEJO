@@ -27,10 +27,10 @@
                 <div class="h2 text-center w-100" style="color: blue">Formulario Candidatos</div>
                 <form method="POST" 
                     {% if form2 %}
-                    action="{% url 'contratacion:editar_oferta' object.id %}"
+                    action="{% url 'contratacion:editar_candidato' object.id %}"
                     
                     {% else %}
-                    action="{% url 'contratacion:crear_oferta' %}"
+                    action="{% url 'contratacion:crear_candidato' %}"
                     {% endif %}
                     class="form-control">
                         {% csrf_token %}
@@ -79,7 +79,7 @@
                             <a  class="btn btn-primary w-100" href="{% url 'contratacion:editar_candidato' candidato.id %}" >Editar</a>
                             <form action="{% url 'contratacion:eliminar_candidato' candidato.id %}" method="post" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</button>
+                                <button type="submit" class="btn btn-danger w-100" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</button>
                             </form>
                         </td>
                     </tr>

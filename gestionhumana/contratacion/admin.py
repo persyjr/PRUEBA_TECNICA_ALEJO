@@ -22,10 +22,9 @@ class PostulacionAdmin(admin.ModelAdmin):
 
 @admin.register(m.OrdenDeContratacion)
 class OrdenDeContratacionAdmin(admin.ModelAdmin):
-    list_display = ('candidato', 'postulacion', 'cliente', 'cargo')
-    search_fields = ('candidato__nombre', 'postulacion__oferta_laboral__cargo', 'cliente')
+    list_display = ( 'postulacion', 'cliente', 'cargo','examenes')
+    search_fields = ( 'postulacion', 'cliente')
     list_filter = ('cliente', 'cargo')
-    readonly_fields = ('examenes',)
 
     def has_add_permission(self, request, obj=None):
-        return False
+        return True
