@@ -1,5 +1,6 @@
 PARA INICIAR PROYECTO
 desde: /PRUEBA_TECNICA_ALEJO
+ruta inicial http://127.0.0.1:8000/contratacion/crear_candidato/
 
 1. Activar entorno venv
 source venv/Script/activate
