@@ -24,7 +24,7 @@ class CrearCandidato(generic.CreateView):
     
     def leer_base(self,):
         print('ingreso a la base')
-        with open('C:/Users/eadel/OneDrive/Documents/VISUAL_STUDIO_PROJECTS/LEARNING_PROJECTS/PRUEBA_TECNICA_ALEJO/JSON.txt', 'r', encoding='utf-8') as file:
+        with open('JSON.txt', 'r', encoding='utf-8') as file:
             data = json.load(file)
             print(data)
             # convertir a lista de objetos Candidato
